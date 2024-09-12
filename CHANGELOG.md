@@ -1,4 +1,6 @@
 # Change Log
+## 0.14.2 (09 Sept 2024)
+1. Fixed " bug causing the extension to break with newer SQLite versions.
 
 ## 0.14.1 (04 Jun 2022)
 
