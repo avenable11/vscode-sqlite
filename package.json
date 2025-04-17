@@ -1,7 +1,7 @@
 {
     "name": "vscode-sqlite-av",
     "icon": "resources/icon/icon_128x128.png",
-    "displayName": "SQLite",
+    "displayName": "SQLite-AV",
     "description": "Explore and query SQLite databases.",
     "version": "0.14.2",
     "publisher": "avenableivytech",
