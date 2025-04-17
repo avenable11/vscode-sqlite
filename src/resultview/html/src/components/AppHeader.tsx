@@ -5,17 +5,18 @@ import BtnExportHtml from "./BtnExportHtml";
 import BtnExportCsv from "./BtnExportCsv";
 
 interface Props {
-    onExport: (format: "csv"|"html"|"json") => void;
+    onExport: (format: "csv" | "html" | "json") => void;
+
 }
 
 const AppHeader: React.FunctionComponent<Props> = (props) => {
     return (
-        <Header style={"transparent"}>
-            <div/>
+        <Header style="transparent">
+            <div />
             <div>
-                <BtnExportCsv onClick={() => props.onExport("csv")}/>
-                <BtnExportHtml onClick={() => props.onExport("html")}/>
-                <BtnExportJson onClick={() => props.onExport("json")}/>
+                <BtnExportCsv onClick={() => props.onExport("csv")} />
+                <BtnExportHtml onClick={() => props.onExport("html")} />
+                <BtnExportJson onClick={() => props.onExport("json")} />
             </div>
         </Header>
     );

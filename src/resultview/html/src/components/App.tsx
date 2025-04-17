@@ -1,5 +1,5 @@
 import * as React from "react";
-import produce from "immer";
+import { produce } from "immer";
 import AppHeader from "./AppHeader";
 import { Api, ResultSetData } from "../api";
 import ResultSetList from "./ResultSetList";
@@ -16,13 +16,13 @@ class App extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {results: []};
+        this.state = { results: [] };
     }
 
     componentDidMount() {
         this.props.api.onResults((results) => {
             const state = produce(this.state, (draftState) => {
-                draftState.results = results.map(result => ({...result}));
+                draftState.results = results.map(result => ({ ...result }));
             });
             this.setState(state);
         });
@@ -42,7 +42,7 @@ class App extends React.Component<Props, State> {
                 <style>
                     {"button:focus {outline: 1px solid -webkit-focus-ring-color;}"}
                 </style>
-                <AppHeader onExport={this.handleExport.bind(this)}/>
+                <AppHeader onExport={this.handleExport.bind(this)} />
                 <ResultSetList
                     list={this.state.results}
                     onExport={this.handleExport.bind(this)}

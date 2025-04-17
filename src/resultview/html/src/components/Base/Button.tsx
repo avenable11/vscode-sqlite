@@ -7,6 +7,7 @@ interface Props {
     height?: string | number;
     background?: string;
     onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    children?: React.ReactNode;
 }
 
 const Button: React.FunctionComponent<Props> = (props) => {
@@ -24,7 +25,7 @@ const Button: React.FunctionComponent<Props> = (props) => {
 
 export default Button;
 
-const styles: {button: React.CSSProperties} = {
+const styles: { button: React.CSSProperties } = {
     button: {
         width: 24,
         height: 24,

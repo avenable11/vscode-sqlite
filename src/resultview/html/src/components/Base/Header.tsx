@@ -1,7 +1,7 @@
 import * as React from "react";
 
-interface Props {
-    style?: "normal"|"transparent";
+interface Props extends React.PropsWithChildren {
+    style?: "normal" | "transparent";
 }
 
 
@@ -15,7 +15,7 @@ export const Header: React.FunctionComponent<Props> = (props) => {
     );
 };
 
-const styles: {[prop: string]: React.CSSProperties} = {
+const styles: { [prop: string]: React.CSSProperties } = {
     header: {
         justifyContent: "space-between",
         display: "flex",

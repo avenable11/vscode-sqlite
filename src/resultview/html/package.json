@@ -10,23 +10,24 @@
         "test": ""
     },
     "devDependencies": {
-        "@types/react": "^16.14.8",
-        "@types/react-dom": "^16.9.13",
-        "@types/react-redux": "^7.1.16",
-        "source-map-loader": "^3.0.0",
-        "ts-loader": "^9.4.2",
-        "typescript": "^3.9.9",
-        "webpack": "^5.75.0",
-        "webpack-cli": "^5.0.1"
+        "@types/react": "^19.1.2",
+        "@types/react-dom": "^19.1.2",
+        "@types/react-redux": "^7.1.32",
+        "source-map-loader": "^5.0.0",
+        "ts-loader": "^9.5.2",
+        "typescript": "^5.8.3",
+        "webpack": "^5.99.5",
+        "webpack-cli": "^6.0.1"
     },
     "dependencies": {
-        "@types/redux-logger": "^3.0.8",
-        "immer": "^9.0.6",
-        "react": "^16.14.0",
-        "react-dom": "^16.14.0",
-        "react-redux": "^7.2.4",
-        "redux": "^4.1.0",
+        "@types/redux-logger": "^3.0.13",
+        "immer": "^10.1.1",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "react-redux": "^9.2.0",
+        "redux": "^5.0.1",
         "redux-logger": "^3.0.6",
-        "redux-thunk": "^2.3.0"
+        "redux-thunk": "^3.1.0",
+        "yargs": "^17.7.2"
     }
 }
