@@ -5,7 +5,7 @@ import { randomString } from "../utils/utils";
 import { Database } from "./interfaces/database";
 const csvparser = require("csv-parser");
 
-const NO_HANDLER = (...args: any[]) => {}; // this is just an empty function to handle callbacks i dont care about
+const NO_HANDLER = (...args: any[]) => { }; // this is just an empty function to handle callbacks i dont care about
 
 const RESULT_SEPARATOR = randomString(8); // just a random separator to recognize when there are no more rows
 
@@ -18,7 +18,7 @@ export class CliDatabase implements Database {
     private startCallback?: (err: Error) => void;
     private endCallback?: (err?: Error) => void;
     private writeCallback?: (rows: string[][], err?: Error) => void;
-    private execQueue: {sql: string, callback?: (rows: string[][], err?: Error) => void}[];
+    private execQueue: { sql: string, callback?: (rows: string[][], err?: Error) => void }[];
     private errStr: string;
     private rows: string[][];
     private busy: boolean;
@@ -34,21 +34,23 @@ export class CliDatabase implements Database {
         this.execQueue = [];
         this.busy = false;
         this.sql = "";
-        
+
         this.startCallback = callback;
 
-        this.csvParser = csvparser({separator: ',', strict: false, headers: false});
-        
+        this.csvParser = csvparser({ separator: ',', strict: false, headers: false });
+
         try {
-            this.sqliteProcess = spawn(this.command, args, {stdio: ['pipe', "pipe", "pipe" ]});
-        } catch(err) {
-            let startError = new Error("SQLite process failed to start: "+err.message);
-            setTimeout(() => this.onStartError(startError), 0);
-            return;
+            this.sqliteProcess = spawn(this.command, args, { stdio: ['pipe', "pipe", "pipe"] });
+        } catch (err) {
+            if (err instanceof Error) {
+                let startError = new Error("SQLite process failed to start: " + err.message);
+                setTimeout(() => this.onStartError(startError), 0);
+                return;
+            }
         }
 
-        this.sqliteProcess.once('error', (err: Error) => {
-            let startError = new Error("SQLite process failed to start: "+err.message);
+        this.sqliteProcess?.once('error', (err: Error) => {
+            let startError = new Error("SQLite process failed to start: " + err.message);
             this.onStartError(startError);
         });
 
@@ -58,28 +60,28 @@ export class CliDatabase implements Database {
             this._write(`select 1 from sqlite_master limit 1;${EOL}`);
             this._write(`.print ${RESULT_SEPARATOR}${EOL}`);
             this.busy = true;
-        } catch(err) {
+        } catch (err: any) {
             setTimeout(() => this.onStartError(err), 0);
             return;
         }
 
-        this.sqliteProcess.once('exit', (code, signal) => {
+        this.sqliteProcess?.once('exit', (code, signal) => {
             this.onExit(code, signal);
         });
 
-        this.sqliteProcess.stderr.on("data", (data) => {
+        this.sqliteProcess?.stderr?.on("data", (data) => {
             this.onError(data);
         });
-        
-        this.sqliteProcess.stdout.pipe(this.csvParser).on("data", (data: Object) => {
+
+        this.sqliteProcess?.stdout?.pipe(this.csvParser).on("data", (data: Object) => {
             this.onData(data);
         });
 
         // register an empty handler for stdio,
         // we dont care about errors,
         // they will only occur when the process stops because of -bail
-        this.sqliteProcess.stdin.once("error", NO_HANDLER);
-        this.sqliteProcess.stdout.once("error", NO_HANDLER);
+        this.sqliteProcess?.stdin?.once("error", NO_HANDLER);
+        this.sqliteProcess?.stdout?.once("error", NO_HANDLER);
         this.csvParser.once("error", NO_HANDLER);
     }
 
@@ -91,15 +93,15 @@ export class CliDatabase implements Database {
         try {
             this._ended = true;
             this.endCallback = callback;
-            this.execQueue.push({sql: ".exit"});
+            this.execQueue.push({ sql: ".exit" });
             if (!this.busy) {
                 this.next();
             }
-        } catch(err) {
+        } catch (err) {
             //
         }
     }
-    
+
     execute(sql: string, callback?: (rows: string[][], err?: Error) => void) {
         if (this._ended) {
             if (callback) callback([], new Error("SQLite process already ended."));
@@ -107,7 +109,7 @@ export class CliDatabase implements Database {
         }
 
         // trim the sql
-        sql= sql.trim();
+        sql = sql.trim();
 
         // add a space after EXPLAIN so that the result is a table (see: https://www.sqlite.org/eqp.html)
         if (sql.toLowerCase().startsWith("explain")) {
@@ -116,11 +118,11 @@ export class CliDatabase implements Database {
         }
 
         try {
-            this.execQueue.push({sql: sql, callback: callback});
+            this.execQueue.push({ sql: sql, callback: callback });
             if (!this.busy) {
                 this.next();
             }
-        }catch(err) {
+        } catch (err) {
             //
         }
     }
@@ -136,13 +138,13 @@ export class CliDatabase implements Database {
 
     private _write(text: string) {
         if (!this.sqliteProcess) return;
-        
+
         // add EOL at the end
         if (!text.endsWith("\n")) text += "\n";
 
         try {
-            this.sqliteProcess.stdin.write(text);
-        } catch(err) {
+            this.sqliteProcess?.stdin?.write(text);
+        } catch (err) {
             //
         }
     }
@@ -157,7 +159,7 @@ export class CliDatabase implements Database {
         }
     }
 
-    private onExit(code: number|null, signal: string|null) {
+    private onExit(code: number | null, signal: string | null) {
         this._ended = true;
         this.csvParser.end();
         if (!this._started) {
@@ -173,7 +175,7 @@ export class CliDatabase implements Database {
 
         if (this.endCallback) this.endCallback();
     }
-    
+
     private onData(data: Object) {
         if (this.errStr) {
             return;
@@ -186,7 +188,7 @@ export class CliDatabase implements Database {
             if (!this._started) {
                 this._started = true;
             }
-            
+
             let result = this.rows;
             if (this.sql.startsWith('.')) {
                 result = [[result.map(row => row.join(' ')).join('\n')]];
@@ -200,9 +202,9 @@ export class CliDatabase implements Database {
         this.rows.push(row);
     }
 
-    private onError(data: string|Buffer) {
+    private onError(data: string | Buffer) {
         if (!data) return;
-        
+
         // Workaround for CentOS (and maybe other OS's) where the command throws an error at the start but everything works fine
         if (data.toString().match(/\: \/lib64\/libtinfo\.so\.[0-9]+: no version information available \(required by /)) return;
 
@@ -214,7 +216,7 @@ export class CliDatabase implements Database {
             if (match) {
                 let token = match[1];
                 let rest = match[2];
-                this.errStr = `${token? `near "${token}": `: ``}${rest}`;
+                this.errStr = `${token ? `near "${token}": ` : ``}${rest}`;
             }
 
             //if (this.sqliteProcess) this.sqliteProcess.kill();

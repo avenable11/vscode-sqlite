@@ -8,11 +8,11 @@ export namespace QuickPick {
         description: string;
         detail?: string;
         picked?: boolean;
-        
+
         constructor(path: string, description?: string) {
             this.path = path;
             this.label = this.toLabel(path);
-            this.description = description? description : path;
+            this.description = description ? description : path;
         }
 
         private toLabel(path: string) {
@@ -25,19 +25,19 @@ export namespace QuickPick {
         description: string;
         detail?: string;
         picked?: boolean;
-        
+
         constructor() {
             this.label = "Choose database from file";
             this.description = "";
         }
     }
-    
+
     export class ErrorItem implements QuickPickItem {
         label: string;
         description?: string;
         detail?: string;
         picked?: boolean;
-        
+
         constructor(label: string) {
             this.label = label;
         }
@@ -49,11 +49,11 @@ export namespace QuickPick {
  * @param hint What to write in the QuickPick
  */
 export function pickWorkspaceDatabase(autopick: boolean, fileExtensions: string[] = [], includeMemory: boolean = true, hint?: string): Thenable<string> {
-    if (fileExtensions == []) {
+    if (fileExtensions.length === 0) {
         fileExtensions = ["db", "db3", "sqlite", "sqlite3", "sdb", "s3db"];
     }
-    const promise = new Promise< Array<QuickPick.DatabaseItem | QuickPick.ErrorItem | QuickPick.FileDialogItem> >((resolve) => {
-        workspace.findFiles('**/*.{'+fileExtensions.join(",")+'}').then((filesUri) => {
+    const promise = new Promise<Array<QuickPick.DatabaseItem | QuickPick.ErrorItem | QuickPick.FileDialogItem>>((resolve) => {
+        workspace.findFiles('**/*.{' + fileExtensions.join(",") + '}').then((filesUri) => {
             let fileDialogItem = new QuickPick.FileDialogItem();
             let items: Array<QuickPick.DatabaseItem | QuickPick.ErrorItem | QuickPick.FileDialogItem> = filesUri.map(uri => new QuickPick.DatabaseItem(uri.fsPath));
             if (includeMemory) items.push(new QuickPick.DatabaseItem(":memory:", "sqlite in-memory database"));
@@ -61,22 +61,22 @@ export function pickWorkspaceDatabase(autopick: boolean, fileExtensions: string[
             resolve(items);
         });
     });
-    return new Promise( (resolve, reject) => {
-        hint = hint? hint : 'Choose a database.';
+    return new Promise((resolve, reject) => {
+        hint = hint ? hint : 'Choose a database.';
         showAutoQuickPick(autopick, promise, hint).then(
             item => {
                 if (item instanceof QuickPick.DatabaseItem) {
                     resolve(item.path);
                 } else if (item instanceof QuickPick.FileDialogItem) {
-                    window.showOpenDialog({filters: {"Database": fileExtensions}}).then(fileUri => {
+                    window.showOpenDialog({ filters: { "Database": fileExtensions } }).then(fileUri => {
                         if (fileUri) {
                             resolve(fileUri[0].fsPath);
                         } else {
-                            resolve();
+                            resolve('');
                         }
                     });
                 } else {
-                    resolve();
+                    resolve('');
                 }
             }
         );
@@ -92,7 +92,7 @@ export function pickListDatabase(autopick: boolean, dbs: string[]): Thenable<str
         items = dbs.map(dbPath => new QuickPick.DatabaseItem(dbPath));
     }
     return new Promise((resolve, reject) => {
-        showAutoQuickPick(autopick, items, 'Choose a database to close.').then( (item) => {
+        showAutoQuickPick(autopick, items, 'Choose a database to close.').then((item) => {
             if (item instanceof QuickPick.DatabaseItem) {
                 resolve(item.path);
             } else {
@@ -108,7 +108,7 @@ export function pickListDatabase(autopick: boolean, dbs: string[]): Thenable<str
  * @param hint 
  */
 export function showAutoQuickPick(autopick: boolean, items: QuickPickItem[] | Thenable<QuickPickItem[]>, hint?: string): Thenable<QuickPickItem> {
-    
+
     if (autopick && items instanceof Array && items.length === 1) {
         let item = items[0];
         return new Promise(resolve => resolve(item));
@@ -123,7 +123,7 @@ export function showAutoQuickPick(autopick: boolean, items: QuickPickItem[] | Th
                 cancTockenSource = new CancellationTokenSource();
                 cancToken = cancTockenSource.token;
 
-                items.then( items => {
+                items.then(items => {
                     if (items.length === 1) {
                         let item = items[0];
                         resolve(item);
@@ -136,9 +136,9 @@ export function showAutoQuickPick(autopick: boolean, items: QuickPickItem[] | Th
                 });
             }
 
-            window.showQuickPick(items, {placeHolder: hint? hint : ''}, cancToken).then( item => {
-                resolve(item);
-                
+            window.showQuickPick(items, { placeHolder: hint ? hint : '' }, cancToken).then(item => {
+                if (item !== undefined) { resolve(item); }
+
                 if (cancTockenSource) {
                     cancTockenSource.dispose();
                 }

@@ -6,7 +6,7 @@ const keywordsSet = new Set(keywords);
  * Sanitizes a string for html
  */
 export function sanitizeStringForHtml(str: string): string {
-    let map: {[char: string]: string} = {
+    let map: { [char: string]: string } = {
         '&': "&amp;",
         '<': "&lt;",
         '>': "&gt;",
@@ -14,7 +14,7 @@ export function sanitizeStringForHtml(str: string): string {
         '"': "&quot;",
         '\'': "&#039;"
     };
-    
+
     return str.replace(/[&<>\/"']/g, m => map[m]);
 }
 
@@ -36,7 +36,7 @@ export function replaceEscapedOctetsWithChar(s: string) {
         try {
             let chars = octalToChars(octal);
             return prevChar + chars;
-        } catch(err) {
+        } catch (err) {
             return substring;
         }
     });
@@ -45,8 +45,8 @@ export function replaceEscapedOctetsWithChar(s: string) {
 export function octalToChars(octal: Array<string>) {
     let hex: string = octal.map(octet => convertFromBaseToBase(octet, 8, 16)).join('');
     let s = new Buffer(hex, 'hex').toString('utf8');
-    for(let i=0; i<s.length; i++) {
-        if(s.charCodeAt(i) === 65533) {
+    for (let i = 0; i < s.length; i++) {
+        if (s.charCodeAt(i) === 65533) {
             // the character is an uncknown character, this is probably binary data
             return hex;
         }
@@ -55,7 +55,7 @@ export function octalToChars(octal: Array<string>) {
 }
 
 export function convertFromBaseToBase(str: string | number, fromBase: number, toBase: number) {
-    if (typeof(str) === 'number') {
+    if (typeof (str) === 'number') {
         str = str.toString();
     }
     var num = parseInt(str, fromBase);
@@ -65,10 +65,10 @@ export function convertFromBaseToBase(str: string | number, fromBase: number, to
 export function splitArrayByCondition<T>(arr: Array<T>, cond: (elem: T) => boolean): Array<T[]> {
     let newArr: Array<T[]> = [];
     arr.forEach(elem => {
-        if (cond(elem) || newArr === []) {
+        if (cond(elem) || newArr.length === 0) {
             newArr.push([elem]);
         } else {
-            newArr[newArr.length-1].push(elem);
+            newArr[newArr.length - 1].push(elem);
         }
     });
     return newArr;
@@ -76,15 +76,15 @@ export function splitArrayByCondition<T>(arr: Array<T>, cond: (elem: T) => boole
 
 
 export function findNotInString(character: string, str: string) {
-    let charArray: Array <string> = Array.from(str);
+    let charArray: Array<string> = Array.from(str);
     let isInString: boolean = false;
     let stringChar: string | null = null;
     let found: number[] = [];
 
     for (let index = 0; index < charArray.length; index++) {
         let char = charArray[index];
-        let prev = index > 0? charArray[index - 1] : null;
-        let next = index < charArray.length? charArray[index + 1] : null;
+        let prev = index > 0 ? charArray[index - 1] : null;
+        let next = index < charArray.length ? charArray[index + 1] : null;
 
         // it's in string, go to next char
         if (prev !== '\\' && (char === '\'' || char === '"') && isInString === false) {
@@ -100,7 +100,7 @@ export function findNotInString(character: string, str: string) {
             continue;
         }
 
-        if ((character.length===1? char === character : char === character[0] && next === character[1]) && isInString === false) {
+        if ((character.length === 1 ? char === character : char === character[0] && next === character[1]) && isInString === false) {
             found.push(index);
             continue;
         }
@@ -111,12 +111,12 @@ export function findNotInString(character: string, str: string) {
 export function splitNotInString(char: string, str: string) {
     let idxs = findNotInString(char, str);
     let substrs: string[] = [];
-    idxs.forEach( (idx, i) => {
-        let start = i > 0? idxs[i-1]+char.length : 0;
+    idxs.forEach((idx, i) => {
+        let start = i > 0 ? idxs[i - 1] + char.length : 0;
         let substr = str.substring(start, idx);
         substrs.push(substr);
     });
-    substrs.push(str.substring(idxs === []? 0 : idxs[idxs.length-1]+char.length));
+    substrs.push(str.substring(idxs.length === 0 ? 0 : idxs[idxs.length - 1] + char.length));
     return substrs;
 }
 
@@ -135,7 +135,7 @@ export function randomString(length: number, extended: boolean = false) {
 export function queryObject(obj: Object, query: string): Object | undefined {
     let ret: Object | undefined = obj;
     let tokens = query.split('/').filter(tkn => tkn !== "");
-    while(true) {
+    while (true) {
         let token = tokens.shift();
         if (token && ret) {
             ret = (<any>ret)[token];
@@ -147,7 +147,7 @@ export function queryObject(obj: Object, query: string): Object | undefined {
 }
 
 export function uniqueBy<T>(arr: T[], prop: string): T[] {
-    var seen: {[key: string]: boolean} = {};
+    var seen: { [key: string]: boolean } = {};
     return arr.filter((item) => {
         let k = (item as any)[prop];
         return k && seen.hasOwnProperty(k) ? false : (seen[k] = true);

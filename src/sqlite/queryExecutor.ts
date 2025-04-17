@@ -10,7 +10,7 @@ export interface QueryExecutionOptions {
     sql: string[]; // sql to execute before executing the query (e.g ATTACH DATABASE <path>; PRAGMA foreign_keys = ON; ecc)
 }
 
-export function executeQuery(sqlite3: string, dbPath: string, query: string, options: QueryExecutionOptions = {sql: []}): Promise<QueryResult> {
+export function executeQuery(sqlite3: string, dbPath: string, query: string, options: QueryExecutionOptions = { sql: [] }): Promise<QueryResult> {
     if (!sqlite3) {
         return Promise.reject(new Error(`Unable to execute query: SQLite command is not valid: '${sqlite3}'`));
     }
@@ -23,7 +23,7 @@ export function executeQuery(sqlite3: string, dbPath: string, query: string, opt
     let statements: Statement[];
     try {
         statements = extractStatements(query);
-    } catch(err) {
+    } catch (err: any) {
         return Promise.reject(`Unable to execute query: ${err.message}`);
     }
 
@@ -31,7 +31,7 @@ export function executeQuery(sqlite3: string, dbPath: string, query: string, opt
     logger.debug(`Statements: ${JSON.stringify(statements)}`);
 
     let resultSet: ResultSet = [];
-    let error: Error|undefined;
+    let error: Error | undefined;
 
     return new Promise((resolve, reject) => {
         let database: Database;
@@ -42,26 +42,26 @@ export function executeQuery(sqlite3: string, dbPath: string, query: string, opt
         });
 
         // execute sql before the queries, reject if there is any error
-        for(let sql of options.sql) {
+        for (let sql of options.sql) {
             database.execute(sql, (_rows, err) => {
                 if (err) error = new Error(`Failed to setup database: ${err.message}`);
             });
         }
 
         // execute statements
-        for(let statement of statements) {
+        for (let statement of statements) {
             database.execute(statement.sql, (rows, err) => {
                 if (err) {
                     error = err;
                 } else {
-                    let header = rows.length > 1? rows.shift() : [];
-                    resultSet.push({stmt: statement.sql, header: header!, rows});
+                    let header = rows.length > 1 ? rows.shift() : [];
+                    resultSet.push({ stmt: statement.sql, header: header!, rows });
                 }
             });
         }
 
         database.close(() => {
-            resolve({resultSet, error});
+            resolve({ resultSet, error });
         });
     });
 }

@@ -1,4 +1,5 @@
-import { TreeItem, TreeItemCollapsibleState, Command, ExtensionContext } from "vscode";
+import { TreeItem, TreeItemCollapsibleState, Command, ExtensionContext, Uri } from "vscode";
+
 import { join, basename } from "path";
 import { Schema } from "../sqlite/schema";
 
@@ -30,8 +31,8 @@ export class DBItem extends SQLItem {
         this.db = db;
 
         this.iconPath = {
-            light: context.asAbsolutePath(join('resources', 'light', 'database.svg')),
-            dark: context.asAbsolutePath(join('resources', 'dark', 'database.svg'))
+            light: Uri.file(context.asAbsolutePath(join('resources', 'light', 'database.svg'))),
+            dark: Uri.file(context.asAbsolutePath(join('resources', 'dark', 'database.svg')))
         };
 
         this.contextValue = 'sqlite.databaseItem';
@@ -54,14 +55,14 @@ export class TableItem extends SQLItem {
         );
         this.table = table;
         this.contextValue = 'sqlite.tableItem';
-        
+
         let icon_name = "table.svg";
         if (table.type === "view") {
             icon_name = "table_view.svg";
         }
         this.iconPath = {
-            light: context.asAbsolutePath(join('resources', 'light', icon_name)),
-            dark: context.asAbsolutePath(join('resources', 'dark', icon_name))
+            light: Uri.file(context.asAbsolutePath(join('resources', 'light', icon_name))),
+            dark: Uri.file(context.asAbsolutePath(join('resources', 'dark', icon_name)))
         };
     }
 
@@ -82,20 +83,20 @@ export class ColumnItem extends SQLItem {
         const pk = column.pk;
         super(
             name,
-            name+` : ${type.toLowerCase()}`,
+            name + ` : ${type.toLowerCase()}`,
             TreeItemCollapsibleState.None,
             command
         );
         this.column = column;
-        
+
         this.contextValue = 'sqlite.columnItem';
 
-        let iconName = notnull? 'col_notnull.svg' : 'col_nullable.svg';
-        iconName = pk > 0? 'col_pk.svg' : iconName;
+        let iconName = notnull ? 'col_notnull.svg' : 'col_nullable.svg';
+        iconName = pk > 0 ? 'col_pk.svg' : iconName;
 
         this.iconPath = {
-            light: context.asAbsolutePath(join('resources', 'light', iconName)),
-            dark: context.asAbsolutePath(join('resources', 'dark', iconName))
+            light: Uri.file(context.asAbsolutePath(join('resources', 'light', iconName))),
+            dark: Uri.file(context.asAbsolutePath(join('resources', 'dark', iconName)))
         };
     }
 

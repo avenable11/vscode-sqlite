@@ -20,13 +20,13 @@ class SQLite implements Disposable {
     }
 
     query(dbPath: string, query: string, options?: QueryExecutionOptions): Promise<QueryResult> {
-        if (!this.sqliteCommand) Promise.resolve({error: "Unable to execute query: provide a valid sqlite3 executable in the setting sqlite.sqlite3."});
+        if (!this.sqliteCommand) Promise.resolve({ error: "Unable to execute query: provide a valid sqlite3 executable in the setting sqlite.sqlite3." });
 
         return executeQuery(this.sqliteCommand, dbPath, query, options);
     }
-    
+
     schema(dbPath: string, options?: QueryExecutionOptions): Promise<Schema.Database> {
-        if (!this.sqliteCommand) Promise.resolve({error: "Unable to execute query: provide a valid sqlite3 executable in the setting sqlite.sqlite3."});
+        if (!this.sqliteCommand) Promise.resolve({ error: "Unable to execute query: provide a valid sqlite3 executable in the setting sqlite.sqlite3." });
 
         return Promise.resolve(Schema.build(dbPath, this.sqliteCommand, options));
     }
@@ -38,9 +38,9 @@ class SQLite implements Disposable {
     setSqliteCommand(sqliteCommand: string) {
         try {
             this.sqliteCommand = validateSqliteCommand(sqliteCommand, this.extensionPath);
-        } catch(e) {
+        } catch (e: any) {
             logger.error(e.message);
-            showErrorMessage(e.message, {title: "Show output", command: Commands.showOutputChannel});
+            showErrorMessage(e.message, { title: "Show output", command: Commands.showOutputChannel });
             this.sqliteCommand = "";
         }
     }
@@ -60,6 +60,6 @@ export function buildQueryExecutionOptions(setupDatabaseConfig: { [dbPath: strin
     return { sql: [] };
 }
 
-export interface QueryResult {resultSet?: ResultSet; error?: Error; }
+export interface QueryResult { resultSet?: ResultSet; error?: Error; }
 
 export default SQLite;
